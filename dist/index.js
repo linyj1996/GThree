@@ -1,20 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Main = void 0;
-require("reflect-metadata");
-var inversify_1 = require("inversify");
-var modules_1 = require("./modules");
-var interface_1 = require("./interface");
+import 'reflect-metadata';
+import { Container } from 'inversify';
+import { createModules } from './modules';
+import { IRendererService } from './interface';
 /**
  * 创建图谱实例
  * @param selector 是一个 container ID
  */
-function Main(selector) {
-    var container = new inversify_1.Container();
-    var core = (0, modules_1.createModules)();
+export function Main(selector) {
+    var container = new Container();
+    var core = createModules();
     container.load(core);
-    var service = container.get(interface_1.IRendererService);
+    var service = container.get(IRendererService);
     return service;
 }
-exports.Main = Main;
 //# sourceMappingURL=index.js.map

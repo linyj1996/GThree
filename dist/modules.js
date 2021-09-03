@@ -1,15 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createModules = void 0;
-var inversify_1 = require("inversify");
-var interface_1 = require("./interface");
-var renderers_1 = require("./renderers");
-function createModules() {
-    return new inversify_1.ContainerModule(function (bind) {
-        bind(interface_1.IRendererService)
-            .to(renderers_1.ThreeRenderer)
+import { ContainerModule } from 'inversify';
+import { IRendererService } from './interface';
+import { ThreeRenderer } from './renderers';
+export function createModules() {
+    return new ContainerModule(function (bind) {
+        bind(IRendererService)
+            .to(ThreeRenderer)
             .inSingletonScope();
     });
 }
-exports.createModules = createModules;
 //# sourceMappingURL=modules.js.map
