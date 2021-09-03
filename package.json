@@ -19,6 +19,7 @@
   "author": "linyj",
   "license": "ISC",
   "dependencies": {
+    "@types/three": "^0.131.0",
     "emit": "0.0.2",
     "inversify": "^5.1.1",
     "reflect-metadata": "^0.1.13",
