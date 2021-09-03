@@ -2,10 +2,11 @@ import { ContainerModule } from "inversify";
 import {
   IRendererProvider,
   IRendererService,
+  IContextService,
   IGraphService,
 } from "./interface";
 import { ThreeRenderer } from "./renderers";
-import { RendererService, GraphService } from "./services";
+import { RendererService, ContextService, GraphService } from "./services";
 export function createModules() {
   return new ContainerModule((bind) => {
     bind<IRendererProvider>(IRendererProvider)
@@ -13,6 +14,9 @@ export function createModules() {
       .inSingletonScope();
     bind<IRendererService>(IRendererService)
       .to(RendererService)
+      .inSingletonScope();
+    bind<IContextService>(IContextService)
+      .to(ContextService)
       .inSingletonScope();
     bind<IGraphService>(IGraphService).to(GraphService).inSingletonScope();
   });
