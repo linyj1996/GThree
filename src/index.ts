@@ -1,7 +1,7 @@
 import 'reflect-metadata'
-import {ContainerModule, Container} from 'inversify'
+import {Container} from 'inversify'
 import { createModules } from './modules'
-import { IRendererService } from './interface'
+import { IGraphService } from './interface'
 /**
  * 创建图谱实例
  * @param selector 是一个 container ID
@@ -12,6 +12,7 @@ export function Main(
   const container = new Container();
   const core = createModules()
   container.load(core)
-  const service = container.get<IRendererService>(IRendererService)
+  const service = container.get<IGraphService>(IGraphService)
+  service.mount(selector)
   return service
 }
