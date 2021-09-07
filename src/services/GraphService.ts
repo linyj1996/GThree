@@ -1,5 +1,5 @@
 import {inject, injectable} from 'inversify'
-import {IRendererService,IGraphService,IContextService} from '../interface'
+import {IRendererService,IGraphService,IContextService, IGraphOptions} from '../interface'
 
 @injectable()
 export class GraphService implements IGraphService {
@@ -8,5 +8,11 @@ export class GraphService implements IGraphService {
   public mount(selector:string){
     this.contextService.init(selector)
     this.rendererService.init();
+  }
+  public data(graphData:IGraphOptions){
+    this.contextService.put(graphData);
+  }
+  public render(){
+    this.rendererService.render();
   }
 }

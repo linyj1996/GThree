@@ -8,4 +8,7 @@ export class RendererService implements IRendererService {
   public init (){
     this.provider.init()
   }
+  public render() {
+    this.provider.render();
+  }
 }
