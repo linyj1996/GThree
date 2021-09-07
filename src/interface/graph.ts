@@ -1,3 +1,5 @@
+import {Object3D} from "three";
+
 export interface IFlexible {
   [key: string]: any;
 }
@@ -58,4 +60,8 @@ export interface IGraphService {
   mount(selector: string, options?: {}): void;
   data(graphData:IGraphOptions):void;
   render();
+}
+export const INodeService = Symbol("INodeService");
+export interface INodeService {
+  create(nodes:INode[]):Object3D
 }

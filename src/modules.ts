@@ -4,9 +4,10 @@ import {
   IRendererService,
   IContextService,
   IGraphService,
+  INodeService,
 } from "./interface";
 import { ThreeRenderer } from "./renderers";
-import { RendererService, ContextService, GraphService } from "./services";
+import { RendererService, ContextService, GraphService, NodeService } from "./services";
 export function createModules() {
   return new ContainerModule((bind) => {
     bind<IRendererProvider>(IRendererProvider)
@@ -18,6 +19,11 @@ export function createModules() {
     bind<IContextService>(IContextService)
       .to(ContextService)
       .inSingletonScope();
-    bind<IGraphService>(IGraphService).to(GraphService).inSingletonScope();
+    bind<IGraphService>(IGraphService)
+      .to(GraphService)
+      .inSingletonScope();
+    bind<INodeService>(INodeService)
+      .to(NodeService)
+      .inSingletonScope();
   });
 }
