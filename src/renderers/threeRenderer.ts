@@ -14,7 +14,7 @@ export class ThreeRenderer implements IRendererProvider {
   private _scene: THREE.Object3D;
   private _camera: THREE.Camera;
   private _renderer: THREE.Renderer;
-
+  private t = 0
   // 计算相机Z轴位置
   private getPositionZ(nodesCount: number): number {
     return (
@@ -42,7 +42,23 @@ export class ThreeRenderer implements IRendererProvider {
     const { nodes, edges } = this.contextService.output();
     const mesh = this.nodeService.create(nodes);
     console.log(mesh)
-    this._scene.add(mesh);
+    mesh && this._scene.add(mesh);
     this._renderer.render(this._scene, this._camera);
+    console.log(this._renderer)
+    console.log(this._scene)
+    console.log(this._camera)
+    this.animate()
+    // setTimeout(()=>{
+    //   this._renderer.render(this._scene,this._camera)
+    // },10000)
+  }
+  private animate(){
+    setInterval(()=>{
+      // this._camera.position.x = 500*Math.sin(Math.PI/180*this.t++)
+      // this._camera.position.y = 500*Math.cos(Math.PI/180*this.t++)
+      this._renderer.render(this._scene,this._camera)
+      console.log(1111111)
+    },1000)
+    
   }
 }

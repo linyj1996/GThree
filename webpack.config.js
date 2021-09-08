@@ -1,7 +1,9 @@
 const path = require('path')
-const webpackCleanPlugin = require('clean-webpack-plugin')
+const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 module.exports = {
-  resolve:['.js','.ts','.json'],
+  resolve:{
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+  },
   devtool:'source-map',
   mode:'production',
   entry:{
@@ -10,7 +12,8 @@ module.exports = {
   output:{
     filename:'[name].js',
     path:path.resolve(__dirname,'dist'),
-    libraryTarget:'commonjs'
+    libraryTarget:'umd',
+    umdNamedDefine: true
   },
   module:{
     rules:[
@@ -25,17 +28,22 @@ module.exports = {
           }
         ],
         exclude: /node_modules/,
+      },
+      {
+        test: /\.(png|jpg|gif|eot|svg|ttf|woff|woff2)(\?\S*)?$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            name:'assets/[name]-[hash].[ext]',
+            outputPath:"assets/image",
+            publicPath:'assets/image',
+            limit: 8192
+          }
+        }
       }
     ]
   },
   plugins:[
-    new webpackCleanPlugin(
-      ['dist'],
-      {
-        root:path.resolve(__dirname),
-        verbose:true,
-        day:false
-      }
-    )
+    new CleanWebpackPlugin()
   ]
 }

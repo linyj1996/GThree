@@ -63,5 +63,5 @@ export interface IGraphService {
 }
 export const INodeService = Symbol("INodeService");
 export interface INodeService {
-  create(nodes:INode[]):Object3D
+  create(nodes:INode[]):Object3D|void
 }

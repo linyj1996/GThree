@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "webpack"
   },
   "keywords": [
     "d3",
@@ -31,6 +31,8 @@
     "@babel/preset-env": "^7.15.0",
     "clean-webpack-plugin": "^4.0.0",
     "ts-loader": "^9.2.5",
-    "webpack": "^5.51.1"
+    "url-loader": "^4.1.1",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0"
   }
 }

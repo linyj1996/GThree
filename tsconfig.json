@@ -12,12 +12,13 @@
     "target": "es5",
     "lib": ["dom","es6"],
     "types": ["reflect-metadata"],
-    "module":"ESNext",
+    "module":"commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports":true
   },
-  "include": ["src/*.ts"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules"],
   "files": [
     "./src/types/global.d.ts"
