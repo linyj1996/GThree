@@ -1,5 +1,5 @@
-import { injectable } from "inversify";
-import { INode, INodeService } from "../interface";
+import { inject, injectable } from "inversify";
+import { INode, INodeService, IEventService } from "../interface";
 import node from '../assets/image/node.png';
 import {
   Float32BufferAttribute,
@@ -8,27 +8,15 @@ import {
   PointsMaterial,
   Points,
   TextureLoader,
-  // CanvasTexture
 } from "three";
 
 @injectable()
 export class NodeService implements INodeService {
-  // private nodeCanvas () {
-  //   const canvas = document.createElement('canvas')
-  //   canvas.width = 100;
-  //   canvas.height = 100;
-  //   const ctx = canvas.getContext('2d')
-  //   ctx.beginPath()
-  //   ctx.arc(50,50,50,0,Math.PI*2,true)
-  //   ctx.closePath()
-  //   ctx.fillStyle = 'red'
-  //   ctx.fill
-  //   return canvas;
-  // }
+  @inject(IEventService) public readonly eventService:IEventService;
+  // 默认贴图
+  private texture = new TextureLoader().load(node)
   public create(nodes: INode[]) {
     let bufferGeometry = new BufferGeometry();
-    // const NODE_TEXTURE = new CanvasTexture(this.nodeCanvas());
-    // NODE_TEXTURE.needsUpdate = true;
     const n = 300;
     const n2 = 150;
     const positions = [];
@@ -53,14 +41,13 @@ export class NodeService implements INodeService {
 
     bufferGeometry.computeBoundingBox();
     const loadTexture = this.load(
-      // "https://sc.seeyouyima.com/avatar_220034361?x-oss-process=image/resize,w_50"
       node
     );
     let material = new PointsMaterial({
       size: 100,
       vertexColors: true,
       transparent: true,
-      map: loadTexture,
+      map: this.texture,
       opacity: 1,
       sizeAttenuation: true,
       color: "#ccffcc",
@@ -71,7 +58,10 @@ export class NodeService implements INodeService {
   }
   private load(url: string) {
     const textureLoader = new TextureLoader();
-    const texture = textureLoader.load(url);
+    const _this = this
+    const texture = textureLoader.load(url,function(){
+      _this.eventService.fire('texture-loaded')
+    });
     return texture;
   }
 }

@@ -3,6 +3,7 @@ import {
   IRendererProvider,
   IContextService,
   INodeService,
+  IEventService,
 } from "../interface";
 import { injectable, inject } from "inversify";
 import * as THREE from "three";
@@ -11,6 +12,7 @@ import * as THREE from "three";
 export class ThreeRenderer implements IRendererProvider {
   @inject(IContextService) public readonly contextService: IContextService;
   @inject(INodeService) public readonly nodeService: INodeService;
+  @inject(IEventService) public readonly eventService: IEventService;
   private _scene: THREE.Object3D;
   private _camera: THREE.Camera;
   private _renderer: THREE.Renderer;
@@ -37,6 +39,9 @@ export class ThreeRenderer implements IRendererProvider {
     this._renderer.setSize(container.offsetWidth, container.offsetHeight);
     this._renderer.render(this._scene, this._camera);
     container.appendChild(this._renderer.domElement);
+    this.eventService.on('texture-loaded',()=>{
+      this._renderer.render(this._scene, this._camera);
+    })
   }
   public render() {
     const { nodes, edges } = this.contextService.output();
@@ -47,7 +52,7 @@ export class ThreeRenderer implements IRendererProvider {
     console.log(this._renderer)
     console.log(this._scene)
     console.log(this._camera)
-    this.animate()
+    // this.animate()
     // setTimeout(()=>{
     //   this._renderer.render(this._scene,this._camera)
     // },10000)

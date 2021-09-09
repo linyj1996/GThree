@@ -12,8 +12,10 @@ module.exports = {
   output:{
     filename:'[name].js',
     path:path.resolve(__dirname,'dist'),
-    libraryTarget:'umd',
-    umdNamedDefine: true
+    library: {
+      name: 'gthree',
+      type:'umd'
+    }
   },
   module:{
     rules:[
