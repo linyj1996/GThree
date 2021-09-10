@@ -1,4 +1,4 @@
-import {Object3D} from "three";
+import {Object3D,Points} from "three";
 import {Emitter,Handler} from 'mitt';
 
 export interface IFlexible {
@@ -66,7 +66,7 @@ export interface IGraphService {
 // 实体
 export const INodeService = Symbol("INodeService");
 export interface INodeService {
-  create(nodes:INode[]):Object3D|void
+  create(nodes:INode[]):Points
 }
 
 // 事件转发服务
@@ -76,4 +76,12 @@ export interface IEventService {
     on(event: string, handler: Handler): void
     off(event: string, handler: Handler): void
     fire(type: string, params?:IFlexible): void
+}
+
+// 配置服务
+export const IConfigService = Symbol("IConfigService")
+export interface IConfigService {
+  assign(config:IFlexible):void
+  get(key?:string):IFlexible|number|string
+  set(key:string,value:IFlexible|number|string):void
 }

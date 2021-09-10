@@ -16,7 +16,11 @@ export class ThreeRenderer implements IRendererProvider {
   private _scene: THREE.Object3D;
   private _camera: THREE.Camera;
   private _renderer: THREE.Renderer;
-  private t = 0
+  private _nodeMesh: THREE.Points
+  private _raycaster: THREE.Raycaster;
+  private _pointer: THREE.Vector2;
+  private _intersected: number; //记录鼠标选中实体
+  private t = 0;
   // 计算相机Z轴位置
   private getPositionZ(nodesCount: number): number {
     return (
@@ -32,38 +36,78 @@ export class ThreeRenderer implements IRendererProvider {
       1,
       container.offsetWidth / container.offsetHeight,
       0.1,
-      18000
+      this.getPositionZ(50000000)
     );
-    this._camera.position.z = 1000;
+    this._camera.position.x = 0;
+    this._camera.position.y = 0;
+    this._camera.position.z = 150;
+    this._camera.lookAt(0,0,0)
     this._renderer = new THREE.WebGLRenderer({ antialias: true });
     this._renderer.setSize(container.offsetWidth, container.offsetHeight);
     this._renderer.render(this._scene, this._camera);
     container.appendChild(this._renderer.domElement);
-    this.eventService.on('texture-loaded',()=>{
+    this.eventService.on("texture-loaded", () => {
       this._renderer.render(this._scene, this._camera);
-    })
+    });
+    this._raycaster = new THREE.Raycaster();
+    this._pointer = new THREE.Vector2();
+    document.addEventListener("pointermove", (event) => {
+      this._pointer.x = (event.clientX / window.innerWidth) * 2;
+      this._pointer.y = (event.clientY / window.innerHeight) * 2;
+    });
   }
   public render() {
     const { nodes, edges } = this.contextService.output();
-    const mesh = this.nodeService.create(nodes);
-    console.log(mesh)
-    mesh && this._scene.add(mesh);
+    this._nodeMesh = this.nodeService.create(nodes);
+    this._scene.add(this._nodeMesh);
     this._renderer.render(this._scene, this._camera);
-    console.log(this._renderer)
-    console.log(this._scene)
-    console.log(this._camera)
-    // this.animate()
-    // setTimeout(()=>{
-    //   this._renderer.render(this._scene,this._camera)
-    // },10000)
+    // this._raycaster.setFromCamera(this._pointer,this._camera)
+    // let intersects = mesh ?this._raycaster.intersectObject(mesh):null
+    // this.highLight()
+    this.animate()
   }
-  private animate(){
-    setInterval(()=>{
-      // this._camera.position.x = 500*Math.sin(Math.PI/180*this.t++)
-      // this._camera.position.y = 500*Math.cos(Math.PI/180*this.t++)
-      this._renderer.render(this._scene,this._camera)
-      console.log(1111111)
-    },1000)
-    
+  private animate() {
+    // this.t += 0.1;
+    // this._camera.position.x = 10 * Math.sin((Math.PI / 180) * this.t);
+    // this._camera.position.y = 10 * Math.cos((Math.PI / 180) * this.t);
+    // this._camera.position.z += 50 * Math.sin((Math.PI / 180) * this.t);
+    this.highLight();
+    // this._camera.updateMatrixWorld();
+    this._renderer.render(this._scene, this._camera);
+    window.requestAnimationFrame(this.animate.bind(this));
+  }
+  private highLight() {
+    // console.log(111111)
+    this._raycaster.setFromCamera(this._pointer,this._camera);
+    const intersects = this._raycaster.intersectObject(this._nodeMesh)
+    const position = this._nodeMesh.geometry.attributes.position.array;
+
+    if(intersects.length>0){
+      if(this._intersected !==intersects[0].index){
+        const index = intersects[0].index
+        this._intersected = intersects[0].index
+        const highLightPosition = []
+        highLightPosition.push(position[index*3],position[index*3+1],position[index*3+2])
+        highLightPosition.push(0,0,0)
+        let bufferGeometry = new THREE.BufferGeometry();
+        bufferGeometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(highLightPosition, 3)
+        );
+        console.log(intersects[0].point)
+        bufferGeometry.computeBoundingBox();
+        let material = new THREE.PointsMaterial({
+          size: 100,
+          vertexColors: true,
+          transparent: true,
+          opacity: 1,
+          sizeAttenuation: true,
+          color: "#ffffcc",
+        });
+        let mesh = new THREE.Points(bufferGeometry, material);
+        this._scene.add(mesh)
+        // this._renderer.render(this._scene, this._camera);
+      }
+    }
   }
 }
