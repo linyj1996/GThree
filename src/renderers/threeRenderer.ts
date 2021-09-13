@@ -7,7 +7,7 @@ import {
 } from "../interface";
 import { injectable, inject } from "inversify";
 import * as THREE from "three";
-
+import {onmessage} from './worker'
 @injectable()
 export class ThreeRenderer implements IRendererProvider {
   @inject(IContextService) public readonly contextService: IContextService;
@@ -20,6 +20,7 @@ export class ThreeRenderer implements IRendererProvider {
   private _raycaster: THREE.Raycaster;
   private _pointer: THREE.Vector2;
   private _intersected: number; //记录鼠标选中实体
+  private _worker:Worker;
   private t = 0;
   // 计算相机Z轴位置
   private getPositionZ(nodesCount: number): number {
@@ -28,6 +29,15 @@ export class ThreeRenderer implements IRendererProvider {
         (1 + Math.pow(nodesCount / 2.12316143430556e31, -0.461309470817812)) +
       150.128392537138
     );
+  }
+  private getDistance(nodesCount: number): number {
+    return (60.5026920478786 - 19.6364818002641) / (1 + Math.pow(nodesCount / 11113.7184968341, -0.705912886177758)) + 19.6364818002641
+  }
+  private getStrength(nodesCount: number): number {
+    return -1 * ((15.0568640234622 - 2.43316256810301) / (1 + Math.pow(nodesCount / 19283.3978670675, -0.422985777119439)) + 2.43316256810301)
+  }
+  private getCol(nodesCount: number): number {
+    return (2148936082128.1 - 1.89052009608515) / (1 + Math.pow(nodesCount / 7.81339751933109E+33, -0.405575129002072)) + 1.89052009608515
   }
   public init() {
     const container = this.contextService.container;
@@ -60,7 +70,23 @@ export class ThreeRenderer implements IRendererProvider {
     });
   }
   public render() {
+    let blob = new Blob([onmessage], {
+      type: 'text/typescript'
+    })
+    this._worker = new Worker(window.URL.createObjectURL(blob))
     const { nodes, edges } = this.contextService.output();
+    let message = {
+      type: 'start',
+      nodes: nodes,
+      DISTANCE: this.getDistance(nodes.length),
+      STRENGTH: this.getStrength(nodes.length),
+      COL: this.getCol(nodes.length),
+      linksBuffer: new Int32Array([])
+    }
+    // this._worker.postMessage(message)
+    // this._worker.onmessage = event=>{
+    //   console.log(event)
+    // }
     this._nodeMesh = this.nodeService.create(nodes);
     this._scene.add(this._nodeMesh);
     this._renderer.render(this._scene, this._camera);
