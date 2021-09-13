@@ -15,7 +15,7 @@ export class ThreeRenderer implements IRendererProvider {
   @inject(IEventService) public readonly eventService: IEventService;
   private _scene: THREE.Object3D;
   private _camera: THREE.Camera;
-  private _renderer: THREE.Renderer;
+  private _renderer: THREE.WebGLRenderer;
   private _nodeMesh: THREE.Points
   private _raycaster: THREE.Raycaster;
   private _pointer: THREE.Vector2;
@@ -40,9 +40,11 @@ export class ThreeRenderer implements IRendererProvider {
     );
     this._camera.position.x = 0;
     this._camera.position.y = 0;
-    this._camera.position.z = 150;
+    this._camera.position.z = 1000;
     this._camera.lookAt(0,0,0)
     this._renderer = new THREE.WebGLRenderer({ antialias: true });
+    // this._renderer.setPixelRatio(window.devicePixelRatio);
+    this._renderer.setPixelRatio(window.devicePixelRatio)
     this._renderer.setSize(container.offsetWidth, container.offsetHeight);
     this._renderer.render(this._scene, this._camera);
     container.appendChild(this._renderer.domElement);
@@ -52,8 +54,9 @@ export class ThreeRenderer implements IRendererProvider {
     this._raycaster = new THREE.Raycaster();
     this._pointer = new THREE.Vector2();
     document.addEventListener("pointermove", (event) => {
-      this._pointer.x = (event.clientX / window.innerWidth) * 2;
-      this._pointer.y = (event.clientY / window.innerHeight) * 2;
+      this._pointer.set( ( event.clientX / container.offsetWidth ) * 2 - 1, - ( event.clientY / container.offsetHeight ) * 2 + 1 );
+      // this._pointer.x = (event.clientX / window.innerWidth) * 2;
+      // this._pointer.y = (event.clientY / window.innerHeight) * 2;
     });
   }
   public render() {
@@ -83,31 +86,49 @@ export class ThreeRenderer implements IRendererProvider {
     const position = this._nodeMesh.geometry.attributes.position.array;
 
     if(intersects.length>0){
-      if(this._intersected !==intersects[0].index){
-        const index = intersects[0].index
-        this._intersected = intersects[0].index
-        const highLightPosition = []
-        highLightPosition.push(position[index*3],position[index*3+1],position[index*3+2])
-        highLightPosition.push(0,0,0)
-        let bufferGeometry = new THREE.BufferGeometry();
-        bufferGeometry.setAttribute(
-          "position",
-          new THREE.Float32BufferAttribute(highLightPosition, 3)
-        );
-        console.log(intersects[0].point)
-        bufferGeometry.computeBoundingBox();
-        let material = new THREE.PointsMaterial({
-          size: 100,
-          vertexColors: true,
-          transparent: true,
-          opacity: 1,
-          sizeAttenuation: true,
-          color: "#ffffcc",
-        });
-        let mesh = new THREE.Points(bufferGeometry, material);
-        this._scene.add(mesh)
-        // this._renderer.render(this._scene, this._camera);
-      }
+      const index = intersects[0].index
+
+      const delt = Math.sqrt(Math.pow(intersects[0].point.x-position[index*3],2)+Math.pow(intersects[0].point.y-position[index*3+1],2))
+        // console.log(delt)
+        if(delt>0.4){
+          // this._intersected = undefined;
+
+          if(this._intersected === intersects[0].index){
+            this._intersected = undefined;
+            this._scene.remove(this._scene.getObjectByName('test-points'))
+            this._renderer.render(this._scene,this._camera)
+            
+          }
+        }else {
+          if(this._intersected !==intersects[0].index){
+            const index = intersects[0].index
+            this._intersected = intersects[0].index
+    
+            
+            const highLightPosition = []
+            highLightPosition.push(position[index*3],position[index*3+1],position[index*3+2])
+            // highLightPosition.push(0,0,0)
+            let bufferGeometry = new THREE.BufferGeometry();
+            bufferGeometry.setAttribute(
+              "position",
+              new THREE.Float32BufferAttribute(highLightPosition, 3)
+            );
+            bufferGeometry.computeBoundingBox();  
+            let material = new THREE.PointsMaterial({
+              size: Math.sqrt(1800),
+              vertexColors: true,
+              transparent: true,
+              opacity: 1,
+              sizeAttenuation: true,
+              color: "#00ff00",
+            });
+            let mesh = new THREE.Points(bufferGeometry, material);
+            mesh.name = 'test-points'
+            this._scene.add(mesh)
+            this._renderer.render(this._scene, this._camera);
+          }
+        }
+      
     }
   }
 }

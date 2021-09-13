@@ -25,9 +25,9 @@ export class NodeService implements INodeService {
     const colors = [];
     const names = [];
     for (let i = 0; i < nodes.length; i++) {
-      let x = Math.random() * n - n2;
-      let y = Math.random() * n - n2;
-      let z = Math.random() * n - n2;
+      let x = Math.floor(Math.random() * n - n2);
+      let y = Math.floor(Math.random() * n - n2);
+      let z = Math.floor(Math.random() * n - n2);
       positions.push(x, y, z);
       let vx = x / n + 0.5;
       let vy = x / n + 0.5;
@@ -46,8 +46,9 @@ export class NodeService implements INodeService {
     const loadTexture = this.load(
       node
     );
+    console.log(positions)
     let material = new PointsMaterial({
-      size: (this.configService.get('nodes.size') as number),
+      size: 60,
       vertexColors: true,
       transparent: true,
       map: this.texture,
