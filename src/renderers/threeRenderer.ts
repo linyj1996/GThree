@@ -7,7 +7,7 @@ import {
 } from "../interface";
 import { injectable, inject } from "inversify";
 import * as THREE from "three";
-import {onmessage} from './worker'
+import Worker from './d3.worker.js'
 @injectable()
 export class ThreeRenderer implements IRendererProvider {
   @inject(IContextService) public readonly contextService: IContextService;
@@ -50,7 +50,7 @@ export class ThreeRenderer implements IRendererProvider {
     );
     this._camera.position.x = 0;
     this._camera.position.y = 0;
-    this._camera.position.z = 1000;
+    this._camera.position.z = 2000;
     this._camera.lookAt(0,0,0)
     this._renderer = new THREE.WebGLRenderer({ antialias: true });
     // this._renderer.setPixelRatio(window.devicePixelRatio);
@@ -70,25 +70,44 @@ export class ThreeRenderer implements IRendererProvider {
     });
   }
   public render() {
-    let blob = new Blob([onmessage], {
-      type: 'text/typescript'
-    })
-    this._worker = new Worker(window.URL.createObjectURL(blob))
+    this._worker = new Worker();
     const { nodes, edges } = this.contextService.output();
     let message = {
       type: 'start',
       nodes: nodes,
-      DISTANCE: this.getDistance(nodes.length),
-      STRENGTH: this.getStrength(nodes.length),
+      DISTANCE: 10,
+      STRENGTH: 10,
       COL: this.getCol(nodes.length),
       linksBuffer: new Int32Array([])
     }
-    // this._worker.postMessage(message)
-    // this._worker.onmessage = event=>{
-    //   console.log(event)
-    // }
+    this._worker.postMessage(message)
+    this._worker.onmessage = event=>{
+      // if(event.data.currentTick>1){
+      //   return;
+      // }
+      const positions =new Float32Array(event.data.nodes)
+      if(this._nodeMesh){
+        const tempPz = []
+        for(let i =0;i<nodes.length;i++){
+          tempPz[i*3] = positions[i*2]
+          tempPz[i*3+1] = positions[i*2+1]
+          tempPz[i*3+2] = 0
+        }
+        console.log(tempPz)
+        this._nodeMesh.geometry.attributes.position = new THREE.Float32BufferAttribute(tempPz,3)
+        this._nodeMesh.geometry.attributes.position.needsUpdate = true
+        // this._renderer.render(this._scene, this._camera);
+        // this.animate()
+        console.log(this._scene)
+        console.log(this._camera)
+        console.log(this._renderer)
+      }
+
+    }
     this._nodeMesh = this.nodeService.create(nodes);
     this._scene.add(this._nodeMesh);
+    this._camera.position.z = this.getPositionZ(nodes.length)*0.8
+    this._camera.updateMatrixWorld()
     this._renderer.render(this._scene, this._camera);
     // this._raycaster.setFromCamera(this._pointer,this._camera)
     // let intersects = mesh ?this._raycaster.intersectObject(mesh):null
@@ -100,7 +119,7 @@ export class ThreeRenderer implements IRendererProvider {
     // this._camera.position.x = 10 * Math.sin((Math.PI / 180) * this.t);
     // this._camera.position.y = 10 * Math.cos((Math.PI / 180) * this.t);
     // this._camera.position.z += 50 * Math.sin((Math.PI / 180) * this.t);
-    this.highLight();
+    // this.highLight();
     // this._camera.updateMatrixWorld();
     this._renderer.render(this._scene, this._camera);
     window.requestAnimationFrame(this.animate.bind(this));

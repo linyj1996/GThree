@@ -14,7 +14,7 @@ export default {
       nodes: [],
       edges: [],
     };
-    const nodeLength = 1000;
+    const nodeLength = 500;
     const edgeLedgth = 1000;
     for (let i = 0; i < nodeLength; i++) {
       data.nodes.push({
