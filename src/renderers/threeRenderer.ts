@@ -78,7 +78,7 @@ export class ThreeRenderer implements IRendererProvider {
       DISTANCE: 10,
       STRENGTH: 10,
       COL: this.getCol(nodes.length),
-      linksBuffer: new Int32Array([])
+      links: edges
     }
     this._worker.postMessage(message)
     this._worker.onmessage = event=>{
@@ -106,7 +106,7 @@ export class ThreeRenderer implements IRendererProvider {
     }
     this._nodeMesh = this.nodeService.create(nodes);
     this._scene.add(this._nodeMesh);
-    this._camera.position.z = this.getPositionZ(nodes.length)*0.8
+    this._camera.position.z = 2.5*this.getPositionZ(nodes.length)
     this._camera.updateMatrixWorld()
     this._renderer.render(this._scene, this._camera);
     // this._raycaster.setFromCamera(this._pointer,this._camera)

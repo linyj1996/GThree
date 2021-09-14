@@ -14,13 +14,19 @@ export default {
       nodes: [],
       edges: [],
     };
-    const nodeLength = 500;
+    const nodeLength = 5000;
     const edgeLedgth = 1000;
     for (let i = 0; i < nodeLength; i++) {
       data.nodes.push({
         id: i.toString(),
         name: "node" + i,
       });
+    }
+    for(let i =0;i<edgeLedgth;i++){
+      data.edges.push({
+        source:Math.floor(Math.random()*nodeLength/2),
+        target:Math.floor((1+Math.random())*nodeLength/2)
+      })
     }
     const TGraph = new gthree.Main('container')
     TGraph.data(data)

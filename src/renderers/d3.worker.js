@@ -2,7 +2,7 @@ import * as d3 from "d3-force";
 let n = 0
 let i = 0
 onmessage = function (event) {
-  const { type, nodes, STRENGTH, DISTANCE, COL } = event.data;
+  const { type, nodes, STRENGTH, DISTANCE, COL, edges } = event.data;
   let links = []
   const simulation = d3
     .forceSimulation(nodes)
@@ -10,7 +10,7 @@ onmessage = function (event) {
     .force(
       "link",
       d3
-        .forceLink(links)
+        .forceLink(edges)
         .id((d) => d.id)
         .distance(DISTANCE)
         .strength(1)

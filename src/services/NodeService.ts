@@ -1,6 +1,11 @@
 import { inject, injectable } from "inversify";
-import { INode, INodeService, IEventService, IConfigService } from "../interface";
-import node from '../assets/image/node.png';
+import {
+  INode,
+  INodeService,
+  IEventService,
+  IConfigService,
+} from "../interface";
+import node from "../assets/image/node.png";
 import {
   Float32BufferAttribute,
   BufferGeometry,
@@ -12,13 +17,13 @@ import {
 
 @injectable()
 export class NodeService implements INodeService {
-  @inject(IEventService) public readonly eventService:IEventService;
-  @inject(IConfigService) public readonly configService:IConfigService;
+  @inject(IEventService) public readonly eventService: IEventService;
+  @inject(IConfigService) public readonly configService: IConfigService;
   // 默认贴图
-  private texture = new TextureLoader().load(node)
+  private texture = new TextureLoader().load(node);
   public create(nodes: INode[]) {
     let bufferGeometry = new BufferGeometry();
-    const n = 2*Math.sqrt(nodes.length);
+    const n = 2 * Math.sqrt(nodes.length);
     const n2 = Math.sqrt(nodes.length);
     const positions = [];
     let color = new Color();
@@ -34,19 +39,17 @@ export class NodeService implements INodeService {
       let vz = x / n + 0.5;
       color.setRGB(vx, vy, vz);
       colors.push(color.r, color.g, color.b);
-      names.push(nodes[i].name)
+      names.push(nodes[i].name);
     }
     bufferGeometry.setAttribute(
       "position",
       new Float32BufferAttribute(positions, 3)
     );
     bufferGeometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
-    bufferGeometry.setAttribute('name',new Float32BufferAttribute(names,1))
+    bufferGeometry.setAttribute("name", new Float32BufferAttribute(names, 1));
     bufferGeometry.computeBoundingBox();
-    const loadTexture = this.load(
-      node
-    );
-    console.log(positions)
+    const loadTexture = this.load(node);
+    console.log(positions);
     let material = new PointsMaterial({
       size: 60,
       vertexColors: true,
@@ -63,9 +66,9 @@ export class NodeService implements INodeService {
   }
   private load(url: string) {
     const textureLoader = new TextureLoader();
-    const _this = this
-    const texture = textureLoader.load(url,function(){
-      _this.eventService.fire('texture-loaded')
+    const _this = this;
+    const texture = textureLoader.load(url, function () {
+      _this.eventService.fire("texture-loaded");
     });
     return texture;
   }
