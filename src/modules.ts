@@ -6,10 +6,11 @@ import {
   IGraphService,
   INodeService,
   IEventService,
-  IConfigService
+  IConfigService,
+  IEdgeService
 } from "./interface";
 import { ThreeRenderer } from "./renderers";
-import { RendererService, ContextService, GraphService, NodeService, EventService, ConfigService } from "./services";
+import { RendererService, ContextService, GraphService, NodeService, EventService, ConfigService, EdgeService } from "./services";
 export function createModules() {
   return new ContainerModule((bind) => {
     bind<IRendererProvider>(IRendererProvider)
@@ -32,6 +33,9 @@ export function createModules() {
       .inSingletonScope()
     bind<IConfigService>(IConfigService)
       .to(ConfigService)
+      .inSingletonScope()
+    bind<IEdgeService>(IEdgeService)
+      .to(EdgeService)
       .inSingletonScope()
   });
 }

@@ -3,20 +3,23 @@ let n = 0
 let i = 0
 onmessage = function (event) {
   const { type, nodes, STRENGTH, DISTANCE, COL, edges } = event.data;
-  let links = []
+  let links = edges
+  console.log(edges)
   const simulation = d3
     .forceSimulation(nodes)
-    .force("charge", d3.forceManyBody().strength(STRENGTH))
+    .force("charge", d3.forceManyBody().strength(-1))
     .force(
       "link",
       d3
-        .forceLink(edges)
+        .forceLink(links)
         .id((d) => d.id)
-        .distance(DISTANCE)
-        .strength(1)
+        .distance(1)
+        .strength(100)
     )
     .force("center", d3.forceCenter(0, 0))
-    .force("collision", d3.forceCollide().radius(COL))
+    .force("x", d3.forceX())
+    .force("y", d3.forceY())
+    // .force("collision", d3.forceCollide().radius(COL))
     .stop();
 
   let maxN = Math.ceil(

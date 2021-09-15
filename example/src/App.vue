@@ -24,10 +24,12 @@ export default {
     }
     for(let i =0;i<edgeLedgth;i++){
       data.edges.push({
-        source:Math.floor(Math.random()*nodeLength/2),
-        target:Math.floor((1+Math.random())*nodeLength/2)
+        id:'e'+i,
+        source:Math.floor(Math.random()*30).toString(),
+        target:Math.floor((1+Math.random())*nodeLength/10).toString()
       })
     }
+    console.log(data)
     const TGraph = new gthree.Main('container')
     TGraph.data(data)
     TGraph.render();

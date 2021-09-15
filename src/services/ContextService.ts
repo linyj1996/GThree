@@ -29,6 +29,7 @@ export class ContextService implements IContextService {
   public output() {
     const nodes = Array.from(this._context.nodes.values()).map((node) => node);
     const edges = Array.from(this._context.edges.values()).map((edge) => edge);
+    console.log(edges)
     return {
       nodes,
       edges,

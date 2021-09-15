@@ -1,4 +1,4 @@
-import {Object3D,Points} from "three";
+import {Object3D,Points,LineSegments} from "three";
 import {Emitter,Handler} from 'mitt';
 
 export interface IFlexible {
@@ -52,7 +52,7 @@ export interface IContextService {
   output():{
     nodes:INode[],
     edges:IEdge[],
-  }
+  };
 }
 
 // 图谱服务
@@ -69,6 +69,11 @@ export interface INodeService {
   create(nodes:INode[]):Points
 }
 
+// 边
+export const IEdgeService = Symbol("IEdgeService")
+export interface IEdgeService {
+  create(edges:IEdge[]):LineSegments
+}
 // 事件转发服务
 export const IEventService = Symbol("IEventService")
 export interface IEventService {

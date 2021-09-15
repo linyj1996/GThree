@@ -3,6 +3,7 @@ import {
   IRendererProvider,
   IContextService,
   INodeService,
+  IEdgeService,
   IEventService,
 } from "../interface";
 import { injectable, inject } from "inversify";
@@ -13,10 +14,12 @@ export class ThreeRenderer implements IRendererProvider {
   @inject(IContextService) public readonly contextService: IContextService;
   @inject(INodeService) public readonly nodeService: INodeService;
   @inject(IEventService) public readonly eventService: IEventService;
+  @inject(IEdgeService) public readonly edgeService: IEdgeService;
   private _scene: THREE.Object3D;
   private _camera: THREE.Camera;
   private _renderer: THREE.WebGLRenderer;
   private _nodeMesh: THREE.Points
+  private _edgeMesh: THREE.LineSegments;
   private _raycaster: THREE.Raycaster;
   private _pointer: THREE.Vector2;
   private _intersected: number; //记录鼠标选中实体
@@ -87,25 +90,37 @@ export class ThreeRenderer implements IRendererProvider {
       // }
       const positions =new Float32Array(event.data.nodes)
       if(this._nodeMesh){
-        const tempPz = []
+        const tempPz1 = []
         for(let i =0;i<nodes.length;i++){
-          tempPz[i*3] = positions[i*2]
-          tempPz[i*3+1] = positions[i*2+1]
-          tempPz[i*3+2] = 0
+          tempPz1[i*3] = positions[i*2]
+          tempPz1[i*3+1] = positions[i*2+1]
+          tempPz1[i*3+2] = 0
         }
-        console.log(tempPz)
-        this._nodeMesh.geometry.attributes.position = new THREE.Float32BufferAttribute(tempPz,3)
-        this._nodeMesh.geometry.attributes.position.needsUpdate = true
-        // this._renderer.render(this._scene, this._camera);
-        // this.animate()
-        console.log(this._scene)
-        console.log(this._camera)
-        console.log(this._renderer)
+        this._nodeMesh.geometry.attributes.position = new THREE.Float32BufferAttribute(tempPz1,3)
+        this._nodeMesh.geometry.attributes.position.needsUpdate = true;
+        const tempPz2 = []
+        // console.log(edges)
+        for(let i=0;i<edges.length;i++){
+          const sourceIndex = nodes.findIndex(node=>node.id === edges[i].source)
+          const targetIndex = nodes.findIndex(node => node.id === edges[i].target)
+          // console.log(sourceIndex,targetIndex)
+          tempPz2[i*6] = tempPz1[sourceIndex*3]
+          tempPz2[i*6+1] = tempPz1[sourceIndex*3+1]
+          tempPz2[i*6+2] = tempPz1[sourceIndex*3+2]
+          tempPz2[i*6+3] = tempPz1[targetIndex*3]
+          tempPz2[i*6+4] = tempPz1[targetIndex*3+1]
+          tempPz2[i*6+5] = tempPz1[targetIndex*3+2]
+        }
+        // console.log(tempPz2)
+        this._edgeMesh.geometry.attributes.position = new THREE.Float32BufferAttribute(tempPz2,3)
+        this._edgeMesh.geometry.attributes.position.needsUpdate = true;
       }
 
     }
     this._nodeMesh = this.nodeService.create(nodes);
+    this._edgeMesh = this.edgeService.create(edges)
     this._scene.add(this._nodeMesh);
+    this._scene.add(this._edgeMesh);
     this._camera.position.z = 2.5*this.getPositionZ(nodes.length)
     this._camera.updateMatrixWorld()
     this._renderer.render(this._scene, this._camera);
